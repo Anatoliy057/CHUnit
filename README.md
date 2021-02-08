@@ -18,7 +18,7 @@ Returns an array of all threads keys that are currently running in the JVM.
 
 ### void x\_safe\_execute([values...], closure):
 
-Executes the given closure. You can also send arguments to the closure, which it may or may not use, depending on the particular closure's definition. Unlike closure, it returns only void and will be executed even if the thread was stopped by a functionx_stop_thread().
+Executes the given closure. You can also send arguments to the closure, which it may or may not use, depending on the particular closure's definition. Unlike closure, it returns only void and will be executed even if the thread was stopped by a function x_stop_thread().
 
 ### boolean x\_stop\_thread(string id):
 
