@@ -105,7 +105,7 @@ public class Threading {
 
         @Override
         public String docs() {
-            return "boolean {string id} Stopping tracked thread named \'id\'. If successful returns true, else false."
+            return "boolean {id} Stopping tracked thread named \'id\'. If successful returns true, else false."
                     + " If the thread performs a " + new x_safe_execute().getName() + "() function, the interrupting thread will wait for execution.";
         }
 

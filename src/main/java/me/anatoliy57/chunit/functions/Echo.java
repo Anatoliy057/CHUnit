@@ -7,7 +7,6 @@ import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
-import com.laytonsmith.core.exceptions.CRE.CRECastException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
@@ -47,7 +46,7 @@ public class Echo {
         }
 
         public Class<? extends CREThrowable>[] thrown() {
-            return new Class[]{CRECastException.class};
+            return new Class[]{};
         }
 
         public boolean isRestricted() {
@@ -97,7 +96,7 @@ public class Echo {
         }
 
         public Class<? extends CREThrowable>[] thrown() {
-            return new Class[]{CRECastException.class};
+            return new Class[]{};
         }
 
         public boolean isRestricted() {
