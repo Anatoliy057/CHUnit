@@ -1,6 +1,7 @@
 package me.anatoliy57.chunit.core;
 
 import com.laytonsmith.PureUtilities.DaemonManager;
+import com.laytonsmith.core.Globals;
 
 public class ExtendDaemonManager extends DaemonManager {
 
@@ -25,13 +26,18 @@ public class ExtendDaemonManager extends DaemonManager {
         original.activateThread(t);
 
         if(autoInit) {
-            ExtendGlobals.GetInstance().initGlobalsForThread(t.getId());
+            synchronized (Globals.class) {
+                ExtendGlobals.GetInstance().initGlobalsForThread(t.getId());
+            }
         }
     }
 
     @Override
     public void deactivateThread(Thread t) {
         original.deactivateThread(t);
+        if(t == null) {
+            t = Thread.currentThread();
+        }
         ExtendGlobals.GetInstance().deleteGlobalsForThread(t.getId());
     }
 

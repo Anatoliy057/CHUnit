@@ -1,13 +1,23 @@
 package me.anatoliy57.chunit.core;
 
-import com.laytonsmith.core.constructs.CArray;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import me.anatoliy57.chunit.util.ReflectionUtils;
 
 import java.util.*;
 
 public class ExtendGlobals implements Map<String, Mixed> {
 
-    private static final ExtendGlobals instance = new ExtendGlobals();
+    private static ExtendGlobals instance;
+
+    public static void InitInstance() {
+        Map<String, Mixed> globals = ReflectionUtils.GetGlobalsMap();
+        if(globals instanceof ExtendGlobals) {
+            instance = (ExtendGlobals) globals;
+        } else {
+            instance = new ExtendGlobals();
+            ReflectionUtils.SetGlobalsMap(instance);
+        }
+    }
 
     public static ExtendGlobals GetInstance() {
         return instance;
@@ -27,35 +37,16 @@ public class ExtendGlobals implements Map<String, Mixed> {
         deleteGlobalsForThread(Thread.currentThread().getId());
     }
 
-    public void clearThreadsGlobals() {
-        for (Map<String, Mixed> global :
-                threadsGlobals.values()) {
-            global.clear();
-        }
-        threadsGlobals.clear();
-    }
-
     void initGlobalsForThread(long threadId) {
-        Map<String, Mixed> newGlobal = new HashMap<>();
-        try {
-            for (Entry<String, Mixed> entry :
-                    OriginalGlobals.GetGlobals().entrySet()) {
-                if(entry.getValue().isInstanceOf(CArray.TYPE)) {
-                    CArray array = (CArray) entry.getValue();
-                    newGlobal.put(entry.getKey(), array.deepClone(array.getTarget()));
-                } else {
-                    newGlobal.put(entry.getKey(), entry.getValue().clone());
-                }
-            }
-        } catch (CloneNotSupportedException e) {
-            throw new Error("Error while copies globals", e);
-        }
-
-        threadsGlobals.put(threadId, newGlobal);
+        threadsGlobals.putIfAbsent(threadId, new HashMap<>());
     }
 
     void deleteGlobalsForThread(long threadId) {
         Optional.ofNullable(threadsGlobals.remove(threadId)).ifPresent(Map::clear);
+    }
+
+    public Map<Long, Map<String, Mixed>> getThreadsGlobals() {
+        return threadsGlobals;
     }
 
     @Override

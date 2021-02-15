@@ -5,18 +5,15 @@ import com.laytonsmith.core.constructs.CNull;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.anatoliy57.chunit.util.ReflectionUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class OriginalGlobals {
 
     private static Map<String, Mixed> originalGlobals;
 
-    public static void SetOriginalGlobal() {
+    public static void InitOriginalGlobal() {
         Map<String, Mixed> globalsMap = ReflectionUtils.GetGlobalsMap();
-        if(globalsMap instanceof ExtendGlobals) {
-            originalGlobals = new HashMap<>();
-        } else {
+        if(!(globalsMap instanceof ExtendGlobals)) {
             originalGlobals = globalsMap;
         }
     }

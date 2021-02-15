@@ -19,13 +19,10 @@ import me.anatoliy57.chunit.util.ReflectionUtils;
 
 import java.util.Set;
 
-
 public class Global {
     public static String docs() {
         return "A set of functions for globals";
     }
-
-    public static ExtendGlobals extendGlobals;
 
     private static String GetNamespace(CArray array, Target t) {
         boolean first = true;
@@ -175,8 +172,7 @@ public class Global {
         }
 
         public String docs() {
-            return  "void {} Initializes globals for this thread from copies of the original."
-                    + " Before that, you must call the procedure \"" + new x_extend_globals().getName() + "\" at least once.";
+            return  "void {} Initializes empty globals for current thread.";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
@@ -193,11 +189,7 @@ public class Global {
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
             synchronized (Globals.class) {
-                if (extendGlobals == null) {
-                    throw new CREUnsupportedOperationException("Extend globals not installed", t);
-                }
-
-                extendGlobals.initGlobalsForCurrentThread();
+                ExtendGlobals.GetInstance().initGlobalsForCurrentThread();
             }
 
 
@@ -242,6 +234,7 @@ public class Global {
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
             CArray array = new CArray(t);
             synchronized (Globals.class) {
+                ExtendGlobals extendGlobals = ExtendGlobals.GetInstance();
                 Set<String> keys = (extendGlobals == null ? OriginalGlobals.GetGlobals() : extendGlobals).keySet();
                 for (String key :
                         keys) {
@@ -333,9 +326,7 @@ public class Global {
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
             synchronized (Globals.class) {
-                if (extendGlobals != null) {
-                    extendGlobals.deleteGlobalsForCurrentThread();
-                }
+                ExtendGlobals.GetInstance().deleteGlobalsForCurrentThread();
             }
 
             return CVoid.VOID;
@@ -347,22 +338,21 @@ public class Global {
     }
 
     @api
-    public static class x_extend_globals extends AbstractFunction {
+    public static class x_set_auto_globals extends AbstractFunction {
 
-        public x_extend_globals() {
+        public x_set_auto_globals() {
         }
 
         public String getName() {
-            return "x_extend_globals";
+            return "x_set_auto_globals";
         }
 
         public Integer[] numArgs() {
-            return new Integer[]{0, 1};
+            return new Integer[]{1};
         }
 
         public String docs() {
-            return  "void {[autoInit]} Installs extended globals that support splitting across threads."
-                    + " \"autoInit\" tells whether to automatically initialize globals when starting threads or not, default false.";
+            return  "void {auto} Sets automatically initialize globals for new threads.";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
@@ -378,22 +368,16 @@ public class Global {
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
-            boolean autoInit = false;
-            if(args.length == 1) {
-                autoInit = ArgumentValidation.getBooleanish(args[0], t);
-            }
-
-            DaemonManager daemonManager = ReflectionUtils.GetDaemonManager(env);
-            if(!(daemonManager instanceof ExtendDaemonManager)) {
-                ExtendDaemonManager extendDaemonManager = new ExtendDaemonManager(daemonManager, autoInit);
-                ReflectionUtils.SetDaemonManager(env, extendDaemonManager);
-            } else {
-                ((ExtendDaemonManager) daemonManager).setAutoInit(autoInit);
-            }
+            boolean autoInit = ArgumentValidation.getBooleanish(args[0], t);
 
             synchronized (Globals.class) {
-                if (extendGlobals == null) {
-                    Global.setExtendGlobal();
+                DaemonManager daemonManager = ReflectionUtils.GetDaemonManager(env);
+                if (daemonManager instanceof ExtendDaemonManager) {
+                    ExtendDaemonManager extendManager = (ExtendDaemonManager) daemonManager;
+                    extendManager.setAutoInit(autoInit);
+                } else {
+                    ExtendDaemonManager extendManager = new ExtendDaemonManager(daemonManager, autoInit);
+                    ReflectionUtils.SetDaemonManager(env, extendManager);
                 }
             }
 
@@ -403,66 +387,5 @@ public class Global {
         public Boolean runAsync() {
             return null;
         }
-    }
-
-    @api
-    public static class x_default_globals extends AbstractFunction {
-
-        public x_default_globals() {
-        }
-
-        public String getName() {
-            return "x_default_globals";
-        }
-
-        public Integer[] numArgs() {
-            return new Integer[]{0};
-        }
-
-        public String docs() {
-            return "void {} Removes the extended version of globals, setting back the default.";
-        }
-
-        public Class<? extends CREThrowable>[] thrown() {
-            return new Class[]{};
-        }
-
-        public boolean isRestricted() {
-            return true;
-        }
-
-        public MSVersion since() {
-            return MSVersion.V3_3_4;
-        }
-
-        public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
-            DaemonManager daemonManager = ReflectionUtils.GetDaemonManager(env);
-            if(daemonManager instanceof ExtendDaemonManager) {
-                ((ExtendDaemonManager) daemonManager).setAutoInit(false);
-            }
-
-            synchronized (Globals.class) {
-                if (extendGlobals != null) {
-                    Global.deleteExtendGlobal();
-                }
-            }
-
-            return CVoid.VOID;
-        }
-
-        public Boolean runAsync() {
-            return null;
-        }
-    }
-
-    public static void setExtendGlobal() {
-        extendGlobals = ExtendGlobals.GetInstance();
-        ReflectionUtils.SetGlobalsMap(extendGlobals);
-    }
-
-    public static void deleteExtendGlobal() {
-        ReflectionUtils.SetGlobalsMap(OriginalGlobals.GetGlobals());
-        extendGlobals.clearThreadsGlobals();
-        extendGlobals = null;
     }
 }

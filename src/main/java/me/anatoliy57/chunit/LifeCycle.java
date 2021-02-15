@@ -5,7 +5,9 @@ import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.Implementation;
 import com.laytonsmith.core.extensions.AbstractExtension;
 import com.laytonsmith.core.extensions.MSExtension;
+import me.anatoliy57.chunit.core.ExtendGlobals;
 import me.anatoliy57.chunit.core.OriginalGlobals;
+import me.anatoliy57.chunit.functions.Global;
 
 @MSExtension("CHUnit")
 public class LifeCycle extends AbstractExtension {
@@ -19,7 +21,8 @@ public class LifeCycle extends AbstractExtension {
             System.out.println("CHUnit " + getVersion() + " loaded.");
         }
 
-        OriginalGlobals.SetOriginalGlobal();
+        OriginalGlobals.InitOriginalGlobal();
+        ExtendGlobals.InitInstance();
     }
 
     @Override
