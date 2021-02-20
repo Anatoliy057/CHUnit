@@ -2,6 +2,8 @@
 
 Extension designed to work [MSUnit](https://github.com/Anatoliy057/MSUnit)
 
+> **Warning!** The extension overrides how the Globals class works.
+
 ***
 
 ## Closures
@@ -20,6 +22,8 @@ Prints a message
 
 ### void println(message):
 Prints a message and then terminate the line.
+
+***
 
 ## Environments
 A set of functions for environment
@@ -50,14 +54,8 @@ Stores a value in the original global storage register (like "export".
 ### mixed original\_import(key, [default]):
 This function likes "import" but imports a value from the original global value register.
 
-### void x\_default\_globals():
-Removes the extended version of globals, setting back the default.
-
-### void x\_extend\_globals([autoInit]):
-Installs extended globals that support splitting across threads. "autoInit" tells whether to automatically initialize globals when starting threads or not, default false.
-
 ### void x\_init\_thread\_globals():
-Initializes globals for this thread from copies of the original. Before that, you must call the procedure "x_extend_globals" at least once.
+Initializes empty globals for the current thread.
 
 ### void x\_remove\_thread\_globals():
 Delete globals for the current thread. If no globals for the thread are init, nothing happen.

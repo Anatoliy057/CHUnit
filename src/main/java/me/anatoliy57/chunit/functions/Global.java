@@ -172,7 +172,7 @@ public class Global {
         }
 
         public String docs() {
-            return  "void {} Initializes empty globals for current thread.";
+            return  "void {} Initializes empty globals for the current thread.";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
