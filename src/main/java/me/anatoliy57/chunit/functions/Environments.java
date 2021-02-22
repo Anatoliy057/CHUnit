@@ -161,10 +161,11 @@ public class Environments {
 
             Procedure val;
             Mixed replacement = args[2];
+            Map<String, Procedure> currentProcedures = env.getEnv(GlobalEnv.class).GetProcs();
             if(replacement.isInstanceOf(CClosure.TYPE)) {
                 val = new ProcClosure(proc, (CClosure) replacement, t);
             } else {
-                val = Optional.ofNullable(procedures.get(replacement.val())).orElseThrow(() -> {
+                val = Optional.ofNullable(currentProcedures.get(replacement.val())).orElseThrow(() -> {
                     throw new CREInvalidProcedureException("Unknown procedure \"" + replacement.val() + '"', t);
                 });
             }
