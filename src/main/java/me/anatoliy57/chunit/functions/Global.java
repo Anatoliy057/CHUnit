@@ -338,6 +338,53 @@ public class Global {
     }
 
     @api
+    public static class x_set_extend_daemon_manager extends AbstractFunction {
+
+        public x_set_extend_daemon_manager() {
+        }
+
+        public String getName() {
+            return "x_set_extend_daemon_manager";
+        }
+
+        public Integer[] numArgs() {
+            return new Integer[]{0};
+        }
+
+        public String docs() {
+            return  "void {} Sets extend daemon manager, that clearing globals when threads deactivated.";
+        }
+
+        public Class<? extends CREThrowable>[] thrown() {
+            return new Class[]{};
+        }
+
+        public boolean isRestricted() {
+            return true;
+        }
+
+        public MSVersion since() {
+            return MSVersion.V3_3_4;
+        }
+
+        public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
+            synchronized (Globals.class) {
+                DaemonManager daemonManager = ReflectionUtils.GetDaemonManager(env);
+                if (!(daemonManager instanceof ExtendDaemonManager)) {
+                    ExtendDaemonManager extendManager = new ExtendDaemonManager(daemonManager, false);
+                    ReflectionUtils.SetDaemonManager(env, extendManager);
+                }
+            }
+
+            return CVoid.VOID;
+        }
+
+        public Boolean runAsync() {
+            return null;
+        }
+    }
+
+    @api
     public static class x_set_auto_globals extends AbstractFunction {
 
         public x_set_auto_globals() {

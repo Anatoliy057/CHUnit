@@ -42,6 +42,12 @@ Swaps one procedure for another (or given closure) in a saved environment
 ## Global
 A set of functions for globals
 
+### void x_set_extend_daemon_manager():
+Sets extend daemon manager, that clearing globals when threads deactivated.
+
+### void x_set_auto_globals(auto):
+ets automatically initialize globals for new threads.
+
 ### boolean is\_auto\_globals():
 Returns whether globals for threads are automatically initialized.
 
