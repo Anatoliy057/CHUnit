@@ -7,18 +7,18 @@ Extension designed to work [MSUnit](https://github.com/Anatoliy057/MSUnit)
 ***
 
 ## Closures
-A set of functions for manipulation of closures
+A set of functions for manipulation of closures.
 
 ### void set\_current\_env():
-Replaces the internal closing environment with the current one
+Replaces the internal closing environment with the current one.
 
 ***
 
 ## Echo
-A set of functions for logs
+A set of functions for logs.
 
 ### void print(message):
-Prints a message
+Prints a message.
 
 ### void println(message):
 Prints a message and then terminate the line.
@@ -26,21 +26,27 @@ Prints a message and then terminate the line.
 ***
 
 ## Environments
-A set of functions for environment
+A set of functions for environment.
 
 ### void remove\_env(id):
-Remove reference of environment by id
+Remove reference of environment by id.
 
 ### void save\_env(id):
-Save reference of environment by id
+Save reference of environment by id.
 
 ### void x\_replace\_procedure(id, proc, replacement):
-Swaps one procedure for another (or given closure) in a saved environment
+Swaps one procedure for another (or given closure) in a saved environment.
+
+### void x_add_procedure(id, proc, [closure])
+Add procedure (or given closure as procedure named by procName) in a saved environment.
+
+### boolean x_remove_procedure(id, proc)
+Remove procedure from a saved environment.
 
 ***
 
 ## Global
-A set of functions for globals
+A set of functions for globals.
 
 ### void x_set_extend_daemon_manager():
 Sets extend daemon manager, that clearing globals when threads deactivated.
@@ -52,10 +58,10 @@ ets automatically initialize globals for new threads.
 Returns whether globals for threads are automatically initialized.
 
 ### void keys\_globals():
-Return array of keys globals
+Return array of keys globals.
 
 ### void original\_export(key, value):
-Stores a value in the original global storage register (like "export".
+Stores a value in the original global storage register (like "export").
 
 ### mixed original\_import(key, [default]):
 This function likes "import" but imports a value from the original global value register.

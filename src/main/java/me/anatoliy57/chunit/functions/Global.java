@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class Global {
     public static String docs() {
-        return "A set of functions for globals";
+        return "A set of functions for globals.";
     }
 
     private static String GetNamespace(CArray array, Target t) {
@@ -116,7 +116,7 @@ public class Global {
         }
 
         public String docs() {
-            return "void {key, value} Stores a value in the original global storage register (like \"" + new DataHandling._export().getName() + "\".";
+            return "void {key, value} Stores a value in the original global storage register (like \"" + new DataHandling._export().getName() + "\").";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
@@ -216,7 +216,7 @@ public class Global {
         }
 
         public String docs() {
-            return  "void {} Return array of keys globals";
+            return  "void {} Return array of keys globals.";
         }
 
         public Class<? extends CREThrowable>[] thrown() {

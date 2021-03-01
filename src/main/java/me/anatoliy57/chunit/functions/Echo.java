@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Echo {
     public static String docs() {
-        return "A set of functions for logs";
+        return "A set of functions for logs.";
     }
 
     public static BufferedWriter out;
@@ -42,7 +42,7 @@ public class Echo {
         }
 
         public String docs() {
-            return "void {message} Prints a message";
+            return "void {message} Prints a message.";
         }
 
         public Class<? extends CREThrowable>[] thrown() {

@@ -16,7 +16,7 @@ import me.anatoliy57.chunit.util.ReflectionUtils;
 public class Closures {
 
     public static String docs() {
-        return "A set of functions for manipulation of closures";
+        return "A set of functions for manipulation of closures.";
     }
 
     @api
@@ -34,7 +34,7 @@ public class Closures {
 
         @Override
         public String docs() {
-            return "void {} Replaces the internal closing environment with the current one";
+            return "void {} Replaces the internal closing environment with the current one.";
         }
 
         @Override
