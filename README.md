@@ -34,14 +34,14 @@ Remove reference of environment by id.
 ### void save\_env(id):
 Save reference of environment by id.
 
-### void x\_replace\_procedure(id, proc, replacement):
-Swaps one procedure for another (or given closure) in a saved environment.
+### void x\_replace\_procedure([id], proc, replacement):
+Swaps one procedure for another (or given closure) in a saved environment (or current if two arguments passed).
 
 ### void x_add_procedure(id, proc, [closure])
 Add procedure (or given closure as procedure named by procName) in a saved environment.
 
-### boolean x_remove_procedure(id, proc)
-Remove procedure from a saved environment.
+### boolean x_remove_procedure([id], proc)
+Remove procedure from a saved environment (or current if two arguments passed).
 
 ***
 

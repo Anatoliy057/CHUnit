@@ -1,8 +1,6 @@
 package me.anatoliy57.chunit.functions;
 
 import com.laytonsmith.annotations.api;
-import com.laytonsmith.core.ArgumentValidation;
-import com.laytonsmith.core.Globals;
 import com.laytonsmith.core.MSVersion;
 import com.laytonsmith.core.Procedure;
 import com.laytonsmith.core.constructs.*;
@@ -14,7 +12,6 @@ import com.laytonsmith.core.exceptions.CRE.CREInvalidProcedureException;
 import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
-import com.laytonsmith.core.functions.ArrayHandling;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import me.anatoliy57.chunit.core.ProcClosure;
 
@@ -126,11 +123,11 @@ public class Environments {
         }
 
         public Integer[] numArgs() {
-            return new Integer[]{3};
+            return new Integer[]{2, 3};
         }
 
         public String docs() {
-            return "void {id, proc, replacement} Swaps one procedure for another (or given closure) in a saved environment.";
+            return "void {[id], proc, replacement} Swaps one procedure for another (or given closure) in a saved environment (or current if two arguments passed).";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
@@ -146,15 +143,24 @@ public class Environments {
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
-            String id = args[0].val();
-            String proc = args[1].val();
 
             Environment savedEnv;
-            synchronized (environmentMap) {
-                savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
-                    throw new CREIndexOverflowException("No environment with this id \""+id+"\" found", t);
-                });
+            String proc;
+            Mixed replacement;
+
+            if(args.length == 2) {
+                savedEnv = env;
+            } else {
+                String id = args[0].val();
+                synchronized (environmentMap) {
+                    savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
+                        throw new CREIndexOverflowException("No environment with this id \"" + id + "\" found", t);
+                    });
+                }
             }
+            proc = args[args.length - 2].val();
+            replacement = args[args.length - 1];
+
             GlobalEnv global = savedEnv.getEnv(GlobalEnv.class);
             Map<String, Procedure> procedures = global.GetProcs();
 
@@ -163,7 +169,6 @@ public class Environments {
             }
 
             Procedure val;
-            Mixed replacement = args[2];
             Map<String, Procedure> currentProcedures = env.getEnv(GlobalEnv.class).GetProcs();
             if(replacement.isInstanceOf(CClosure.TYPE)) {
                 val = new ProcClosure(proc, (CClosure) replacement, t);
@@ -266,11 +271,11 @@ public class Environments {
         }
 
         public Integer[] numArgs() {
-            return new Integer[]{2};
+            return new Integer[]{1, 2};
         }
 
         public String docs() {
-            return "boolean {id, procName} Remove procedure from a saved environment.";
+            return "boolean {[id], procName} Remove procedure from a saved environment (or current if two arguments passed).";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
@@ -286,15 +291,20 @@ public class Environments {
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
-            String id = args[0].val();
-            String proc = args[1].val();
-
             Environment savedEnv;
-            synchronized (environmentMap) {
-                savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
-                    throw new CREIndexOverflowException("No environment with this id \""+id+"\" found", t);
-                });
+            String proc = args[args.length - 1].val();
+
+            if (args.length == 1) {
+                savedEnv = env;
+            } else {
+                String id = args[0].val();
+                synchronized (environmentMap) {
+                    savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
+                        throw new CREIndexOverflowException("No environment with this id \""+id+"\" found", t);
+                    });
+                }
             }
+
             GlobalEnv global = savedEnv.getEnv(GlobalEnv.class);
             Map<String, Procedure> procedures = global.GetProcs();
 
