@@ -6,7 +6,7 @@
 
     <groupId>me.anatoliy57</groupId>
     <artifactId>chunit</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -96,18 +96,11 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>enginehub-maven</id>
-            <url>https://maven.enginehub.org/repo/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>commandhelper</artifactId>
-            <version>3.3.4-SNAPSHOT</version>
+            <version>3.3.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

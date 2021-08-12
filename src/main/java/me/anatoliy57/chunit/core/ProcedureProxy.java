@@ -1,7 +1,6 @@
 package me.anatoliy57.chunit.core;
 
 import com.laytonsmith.core.Procedure;
-import com.laytonsmith.core.constructs.CClosure;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.natives.interfaces.Mixed;
@@ -9,32 +8,26 @@ import com.laytonsmith.core.natives.interfaces.Mixed;
 import java.util.Collections;
 import java.util.List;
 
-public class ProcClosure extends Procedure implements Cloneable {
-
+public class ProcedureProxy extends Procedure {
     private final String name;
-    private CClosure closure;
+    private Function func;
 
-    public ProcClosure(String name, CClosure closure, Target t) {
+    public ProcedureProxy(String name, Function func, Target t) {
         super(name, null, Collections.EMPTY_LIST, null, t);
 
         this.name = name;
-        this.closure = closure;
+        this.func = func;
     }
 
     @Override
     public Mixed execute(List<Mixed> args, Environment oldEnv, Target t) {
-        Mixed[] values = new Mixed[args.size()];
-        args.toArray(values);
-        return closure.executeCallable(values);
+        return func.execute(args, oldEnv, t);
     }
 
     @Override
     public Procedure clone() throws CloneNotSupportedException {
-        ProcClosure clone = (ProcClosure)super.clone();
-
-        if(closure != null) {
-            clone.closure = this.closure.clone();
-        }
+        ProcedureProxy clone = (ProcedureProxy)super.clone();
+        clone.func = (Function)this.func.clone();
 
         return clone;
     }

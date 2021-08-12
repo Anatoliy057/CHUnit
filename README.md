@@ -2,15 +2,19 @@
 
 Extension designed to work [MSUnit](https://github.com/Anatoliy057/MSUnit)
 
-> **Warning!** The extension overrides how the Globals class works.
-
 ***
 
-## Closures
-A set of functions for manipulation of closures.
+## Functions
+A set of functions for manipulation of 'functions').
 
-### void set\_current\_env():
-Replaces the internal closing environment with the current one.
+### void to\_func(procName, [...value]):
+Save given procedure as variable with default arguments.
+
+### void do\_func(func, [...value]):
+Execution function with given arguments.
+
+### void do\_func_array(func, valueArray):
+Execution function with given array arguments.
 
 ***
 
@@ -34,43 +38,22 @@ Remove reference of environment by id.
 ### void save\_env(id):
 Save reference of environment by id.
 
-### void x\_replace\_procedure([id], proc, replacement):
-Swaps one procedure for another (or given closure) in a saved environment (or current if two arguments passed).
-
-### void x_add_procedure(id, proc, [closure])
-Add procedure (or given closure as procedure named by procName) in a saved environment.
+### void x\_replace\_procedure([id], proc, func):
+Swaps one procedure for function in a saved environment (or current if two arguments passed).
 
 ### boolean x_remove_procedure([id], proc)
 Remove procedure from a saved environment (or current if two arguments passed).
 
 ***
 
-## Global
-A set of functions for globals.
+## Globals
+Set of function for interactions with globals variables locally for threads
 
-### void x_set_extend_daemon_manager():
-Sets extend daemon manager, that clearing globals when threads deactivated.
+### void local\_export(key, value):
+Stores a value in the local global for thread (like "export").
 
-### void x_set_auto_globals(auto):
-ets automatically initialize globals for new threads.
-
-### boolean is\_auto\_globals():
-Returns whether globals for threads are automatically initialized.
-
-### void keys\_globals():
-Return array of keys globals.
-
-### void original\_export(key, value):
-Stores a value in the original global storage register (like "export").
-
-### mixed original\_import(key, [default]):
-This function likes "import" but imports a value from the original global value register.
-
-### void x\_init\_thread\_globals():
-Initializes empty globals for the current thread.
-
-### void x\_remove\_thread\_globals():
-Delete globals for the current thread. If no globals for the thread are init, nothing happen.
+### mixed local\_import(key, [default]):
+This function likes "import" but imports a value from the local thread global value.
 
 ***
 

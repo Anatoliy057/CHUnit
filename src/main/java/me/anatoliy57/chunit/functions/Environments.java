@@ -13,7 +13,8 @@ import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import me.anatoliy57.chunit.core.ProcClosure;
+import me.anatoliy57.chunit.core.Function;
+import me.anatoliy57.chunit.core.ProcedureProxy;
 
 import java.util.*;
 
@@ -51,7 +52,7 @@ public class Environments {
         }
 
         public MSVersion since() {
-            return MSVersion.V3_0_2;
+            return MSVersion.V3_3_4;
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
@@ -95,7 +96,7 @@ public class Environments {
         }
 
         public MSVersion since() {
-            return MSVersion.V3_0_2;
+            return MSVersion.V3_3_4;
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
@@ -127,83 +128,7 @@ public class Environments {
         }
 
         public String docs() {
-            return "void {[id], proc, replacement} Swaps one procedure for another (or given closure) in a saved environment (or current if two arguments passed).";
-        }
-
-        public Class<? extends CREThrowable>[] thrown() {
-            return new Class[]{CREInvalidProcedureException.class, CREIndexOverflowException.class};
-        }
-
-        public boolean isRestricted() {
-            return true;
-        }
-
-        public MSVersion since() {
-            return MSVersion.V3_0_2;
-        }
-
-        public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
-
-            Environment savedEnv;
-            String proc;
-            Mixed replacement;
-
-            if(args.length == 2) {
-                savedEnv = env;
-            } else {
-                String id = args[0].val();
-                synchronized (environmentMap) {
-                    savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
-                        throw new CREIndexOverflowException("No environment with this id \"" + id + "\" found", t);
-                    });
-                }
-            }
-            proc = args[args.length - 2].val();
-            replacement = args[args.length - 1];
-
-            GlobalEnv global = savedEnv.getEnv(GlobalEnv.class);
-            Map<String, Procedure> procedures = global.GetProcs();
-
-            if(!procedures.containsKey(proc)) {
-                throw new CREInvalidProcedureException("Unknown procedure \"" + proc + "\" in saved environment", t);
-            }
-
-            Procedure val;
-            Map<String, Procedure> currentProcedures = env.getEnv(GlobalEnv.class).GetProcs();
-            if(replacement.isInstanceOf(CClosure.TYPE)) {
-                val = new ProcClosure(proc, (CClosure) replacement, t);
-            } else {
-                val = Optional.ofNullable(currentProcedures.get(replacement.val())).orElseThrow(() -> {
-                    throw new CREInvalidProcedureException("Unknown procedure \"" + replacement.val() + "\" in current environment", t);
-                });
-            }
-
-            procedures.put(proc, val);
-
-            return CVoid.VOID;
-        }
-
-        public Boolean runAsync() {
-            return null;
-        }
-    }
-
-    @api
-    public static class x_add_procedure extends AbstractFunction {
-
-        public x_add_procedure() {
-        }
-
-        public String getName() {
-            return "x_add_procedure";
-        }
-
-        public Integer[] numArgs() {
-            return new Integer[]{2, 3};
-        }
-
-        public String docs() {
-            return "void {id, procName, [closure]} Add procedure (or given closure as procedure named by procName) in a saved environment.";
+            return "void {[id], proc, replacement} Swaps one procedure for function in a saved environment (or current if two arguments passed).";
         }
 
         public Class<? extends CREThrowable>[] thrown() {
@@ -215,41 +140,37 @@ public class Environments {
         }
 
         public MSVersion since() {
-            return MSVersion.V3_0_2;
+            return MSVersion.V3_3_4;
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
-            String id = args[0].val();
-            String proc = args[1].val();
 
             Environment savedEnv;
-            synchronized (environmentMap) {
-                savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
-                    throw new CREIndexOverflowException("No environment with this id \""+id+"\" found", t);
-                });
+            if (args.length == 2) {
+                savedEnv = env;
+            } else {
+                String id = args[0].val();
+                synchronized (environmentMap) {
+                    savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
+                        throw new CREIndexOverflowException("No environment with this id \"" + id + "\" found", t);
+                    });
+                }
             }
+
+            String proc = args[args.length - 2].val();
+            Mixed replacement = args[args.length - 1];
+            if (!replacement.isInstanceOf(Function.TYPE)) {
+                throw new CRECastException("Expecting a function for argument 2", t);
+            }
+            Function func = (Function) replacement;
+
             GlobalEnv global = savedEnv.getEnv(GlobalEnv.class);
             Map<String, Procedure> procedures = global.GetProcs();
-
-            if(procedures.containsKey(proc)) {
-                throw new CREInvalidProcedureException("Procedure already exists \"" + proc + "\" in saved environment", t);
+            if (!procedures.containsKey(proc)) {
+                throw new CREInvalidProcedureException("Unknown procedure \"" + proc + "\" in saved environment", t);
             }
 
-            Procedure val;
-            if(args.length == 3) {
-                if(!args[2].isInstanceOf(CClosure.TYPE)) {
-                    throw new CRECastException("Expecting a closure for argument 2", t);
-                }
-                CClosure closure = (CClosure) args[2];
-                val = new ProcClosure(proc, closure, t);
-            } else {
-                Map<String, Procedure> currentProcedures = env.getEnv(GlobalEnv.class).GetProcs();
-
-                val = Optional.ofNullable(currentProcedures.get(proc)).orElseThrow(() -> {
-                    throw new CREInvalidProcedureException("Unknown procedure \"" + proc + "\" in current environment", t);
-                });
-            }
-
+            Procedure val = new ProcedureProxy(proc, func, t);
             procedures.put(proc, val);
 
             return CVoid.VOID;
@@ -287,7 +208,7 @@ public class Environments {
         }
 
         public MSVersion since() {
-            return MSVersion.V3_0_2;
+            return MSVersion.V3_3_4;
         }
 
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
@@ -300,7 +221,7 @@ public class Environments {
                 String id = args[0].val();
                 synchronized (environmentMap) {
                     savedEnv = Optional.ofNullable(environmentMap.get(id)).orElseThrow(() -> {
-                        throw new CREIndexOverflowException("No environment with this id \""+id+"\" found", t);
+                        throw new CREIndexOverflowException("No environment with this id \"" + id + "\" found", t);
                     });
                 }
             }
